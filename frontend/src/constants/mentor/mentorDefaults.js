@@ -1,0 +1,31 @@
+/** Empty teacher profile shape — no fabricated user data */
+export const EMPTY_TEACHER_PROFILE = {
+  firstName: '',
+  lastName: '',
+  displayName: '',
+  title: '',
+  username: '',
+  email: '',
+  phone: '',
+  province: '',
+  locationDistrict: '',
+  locationCommune: '',
+  locationVillage: '',
+  portfolios: [{ id: 1, link: '', title: '' }],
+  major: '',
+  subject: '',
+  primarySubject: '',
+  gender: '',
+  bio: '',
+  experienceYears: null,
+  workOrganization: '',
+  workPosition: '',
+  experience: [],
+  schedule: [],
+  rating: 0,
+  reviewCount: 0,
+  groupStudents: 0,
+  hoursTaught: 0,
+}
+
+export const TEACHER_GENDER_OPTIONS = ['Male', 'Female', 'Other']
