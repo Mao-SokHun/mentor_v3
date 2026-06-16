@@ -17,7 +17,10 @@
     "db:sync": "node -e \"import('./models/index.js').then(async (m) => { await m.sequelize.sync(); console.log('✅ Tables synced'); process.exit(0); })\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write \"**/*.{js,json,md}\""
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -31,7 +34,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
-    "multer":"2.1.1",
+    "multer": "2.1.1",
     "nodemailer": "^8.0.9",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
@@ -42,14 +45,19 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@jest/globals": "^30.4.1",
+    "cross-env": "^10.1.0",
     "eslint": "^8.57.1",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.3.0",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.4",
     "prettier": "^3.8.3",
-    "sequelize-cli": "^6.6.5"
+    "sequelize-cli": "^6.6.5",
+    "sqlite3": "^6.0.1",
+    "supertest": "^7.2.2"
   }
 }

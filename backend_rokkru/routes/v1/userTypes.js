@@ -1,9 +1,9 @@
 import express from 'express';
 const router = express.Router();
-import * as userTypesController from '../../controllers/userTypesController.js';
-import { getUserTypes, createUserType } from '../../controllers/userTypesController.js';
+import * as userTypesController from '../../controllers/student_system/userTypesController.js';
+import { getUserTypes, createUserType } from '../../controllers/student_system/userTypesController.js';
 /**
- * @openapi
+ * @swagger
  * /api/v1/user-types:
  *   get:
  *     summary: Retrieve all user types
@@ -30,7 +30,7 @@ import { getUserTypes, createUserType } from '../../controllers/userTypesControl
 router.get('/', getUserTypes);
 
 /**
- * @openapi
+ * @swagger
  * /api/v1/user-types:
  *   post:
  *     summary: Create a new user type

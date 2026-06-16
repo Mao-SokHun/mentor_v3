@@ -1,4 +1,4 @@
-import { UserType } from '../models/index.js';
+import { UserType } from '../../models/index.js';
 
 /**
  * Get all user types from the database.

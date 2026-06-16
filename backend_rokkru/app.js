@@ -12,6 +12,7 @@ dotenv.config();
 import authRoutes from './routes/v1/auth/auth.js';
 import userTypesRouter from './routes/v1/userTypes.js';
 import stripeRoutes from './routes/v1/stripe.js';
+import studentRouter from './routes/v1/students.js';
 import { stripeWebhook } from './controllers/stripe/stripeWebhook.js';
 
 const app = express();
@@ -51,7 +52,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check and database connectivity verification route
+// Health check
 app.get('/health', async (req, res) => {
   try {
     await sequelize.authenticate();
@@ -72,6 +73,7 @@ app.get('/health', async (req, res) => {
 // API Routes
 app.use('/api/v1/', mentorRoutes);
 app.use('/api/v1/user-types', userTypesRouter);
+app.use('/api/v1/students', studentRouter);
 
 // Auth
 app.use('/api/v1/auth', authRoutes);
@@ -94,12 +96,12 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
       console.log(`🔗 Health check available at http://localhost:${PORT}/health`);
+      console.log(`📚 Swagger docs available at http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server due to database connection issue:', error);
+    console.error('❌ Failed to start server:', error);
     process.exit(1);
   }
 }
 
 startServer();
-

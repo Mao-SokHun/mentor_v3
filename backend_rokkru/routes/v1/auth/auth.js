@@ -20,7 +20,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/auth/register:
+ * /api/v1/auth/register:
  *   post:
  *     summary: Register a new user
  *     description: Create a new user account with email, password, and user type
@@ -44,13 +44,13 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.post('/register', registerLimit ,register)
+router.post('/register', registerLimit, register)
 
 // login
 
 /**
  * @swagger
- * /api/auth/login:
+ * /api/v1/auth/login:
  *   post:
  *     summary: User login
  *     description: Authenticate user and receive JWT token
@@ -74,13 +74,13 @@ router.post('/register', registerLimit ,register)
  *       500:
  *         description: Server error
  */
-router.post('/login', loginLimit ,login)
+router.post('/login', loginLimit, login)
 
 // logout
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /api/v1/auth/logout:
  *   post:
  *     summary: Logout user
  *     description: End user session and invalidate token
@@ -96,13 +96,13 @@ router.post('/login', loginLimit ,login)
  *       500:
  *         description: Server error
  */
-router.post('/logout', verifyRefreshToken,logout)
+router.post('/logout', verifyRefreshToken, logout)
 
 // verify otp (login)
 
 /**
  * @swagger
- * /api/auth/verify-otp:
+ * /api/v1/auth/verify-otp:
  *   post:
  *     summary: Verify OTP for login
  *     description: Verify OTP sent to user's email during login
@@ -128,7 +128,7 @@ router.post('/verify-otp', verifyOTP)
 
 /**
  * @swagger
- * /api/auth/reset-password:
+ * /api/v1/auth/reset-password:
  *   post:
  *     summary: Reset password
  *     description: Change user password (requires authentication)
@@ -156,13 +156,13 @@ router.post('/verify-otp', verifyOTP)
  *       500:
  *         description: Server error
  */
-router.post('/reset-password', protect, resetPassword )
+router.post('/reset-password', protect, resetPassword)
 
 // forgot password
 
 /**
  * @swagger
- * /api/auth/forgot-password:
+ * /api/v1/auth/forgot-password:
  *   post:
  *     summary: Request password reset
  *     description: Send OTP to user's email for password reset
@@ -189,7 +189,7 @@ router.post('/forgot-password', forgotPassword)
 
 /**
  * @swagger
- * /api/auth/verify-forgot-otp:
+ * /api/v1/auth/verify-forgot-otp:
  *   post:
  *     summary: Verify forgot password OTP
  *     description: Verify OTP sent for password reset
@@ -213,7 +213,7 @@ router.post('/verify-forgot-otp', verifyForgotOTP)
 
 /**
  * @swagger
- * /api/auth/set-new-password:
+ * /api/v1/auth/set-new-password:
  *   post:
  *     summary: Set new password
  *     description: Set new password after OTP verification
@@ -243,7 +243,7 @@ router.post('/set-new-password', setNewPassword)
 
 /**
  * @swagger
- * /api/auth/profile:
+ * /api/v1/auth/profile:
  *   get:
  *     summary: Get user profile
  *     description: Retrieve authenticated user's profile information
