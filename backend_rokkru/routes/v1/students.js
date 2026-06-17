@@ -1,20 +1,19 @@
 import express from 'express';
-import { getStudents, getStudentById, createStudent, updateStudent, deleteStudent, getMyProfile, updateMyProfile } from '../../controllers/student_system/studentController.js';
-import { getAllPosts, getPostById, createPost, updatePost, deletePost, getCommunityTypes, getMyPosts, getCommunityHistory } from '../../controllers/student_system/studentCommunityController.js';
+import { getStudents, getStudentById, createStudent, updateStudent, deleteStudent, getMyProfile, updateMyProfile } from '../../controllers/studentSystem/studentController.js';
+import { getAllPosts, getPostById, createPost, updatePost, deletePost, getCommunityTypes, getMyPosts, getCommunityHistory } from '../../controllers/studentSystem/studentCommunityController.js';
 import {
   getAccountHistory,
   getAccountLogs as getActivityLogs,
   getFullHistory
-} from '../../controllers/student_system/studentHistoryController.js';
+} from '../../controllers/studentSystem/studentHistoryController.js';
 import { protect } from '../../middleware/auth/auth.js';
 import { authorize } from '../../middleware/auth/rbacAuthorize.js';
-import { devBypass } from '../../middleware/auth/devBypass.js';
 
 const router = express.Router();
 
 // Protect all student routes and require `student` role
-// Use a dev bypass when explicitly enabled via env var
-
+router.use(protect);
+router.use(authorize('student'));
 
 /**
  * @swagger

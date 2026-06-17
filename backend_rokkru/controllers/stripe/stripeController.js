@@ -137,7 +137,7 @@ export const listSubscriptionPlans = async (req, res) => {
   try {
     const plans = await SubscriptionPlan.findAll({
       attributes: [
-        'subscription_Plan_id',
+        'subscription_plan_id',
         'name',
         'price',
         'duration_day',

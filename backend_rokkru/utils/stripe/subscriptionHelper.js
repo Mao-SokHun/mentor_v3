@@ -28,7 +28,7 @@ export async function activateSubscription({ userId, subscriptionPlanId, userTyp
   const existing = await Subscription.findOne({ where: { user_id: userId } });
 
   if (existing) {
-    existing.subscription_Plan_id = subscriptionPlanId;
+    existing.subscription_plan_id = subscriptionPlanId;
     existing.start_date = startDate;
     existing.end_date = endDate;
     if (userTypeId) {
@@ -39,7 +39,7 @@ export async function activateSubscription({ userId, subscriptionPlanId, userTyp
   }
 
   return Subscription.create({
-    subscription_Plan_id: subscriptionPlanId,
+    subscription_plan_id: subscriptionPlanId,
     user_id: userId,
     user_type_id: userTypeId,
     start_date: startDate,

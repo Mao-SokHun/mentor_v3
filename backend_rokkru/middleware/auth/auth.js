@@ -1,8 +1,8 @@
-import jwt from  'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import User from '../../models/userModel.js';
 import UserType from '../../models/userTypeModel.js';
 
-export const protect = async (req, res, next ) => {
+export const protect = async (req, res, next) => {
     try {
         let token = req.cookies.token;
 
@@ -21,7 +21,7 @@ export const protect = async (req, res, next ) => {
             include: UserType,
         });
 
-        if(!user){
+        if (!user) {
             return res.status(401).json(
                 {
                     message: 'Unauthorized, user not found'

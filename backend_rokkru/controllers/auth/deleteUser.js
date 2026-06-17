@@ -6,6 +6,12 @@ export const deleteUser = async (req, res) => {
   try {
     const { user_id, password } = req.body;
 
+    if (!password) {
+      return res.status(400).json({
+        message: "Password is required",
+      });
+    }
+
     if (!validatePassword(password)) {
       return res.status(400).json({
         message:

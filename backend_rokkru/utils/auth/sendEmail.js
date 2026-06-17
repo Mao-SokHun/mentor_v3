@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import { otpEmailTemplate } from "./emailTemplate.js";
+
 
 export const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -13,7 +15,7 @@ export const sendEmail = async (email, code) => {
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
-        subject: "Password Reset OTP",
-        text: `Your OTP code is: ${code}`,
+        subject: "Your Confirmation Code",
+        html: otpEmailTemplate(code, email),
     });
 };

@@ -3,16 +3,15 @@ import { register, login, logout, profile } from '../../../controllers/auth/auth
 import { verifyOTP } from '../../../controllers/auth/verifyOTP.js';
 import { resetPassword } from '../../../controllers/auth/resetPassword.js';
 import { protect } from '../../../middleware/auth/auth.js';
-import { forgotPassword } from '../../../controllers/auth/Forgot Password/forgotPassword.js';
-import { setNewPassword } from '../../../controllers/auth/Forgot Password/setNewPassword.js';
-import { verifyForgotOTP } from '../../../controllers/auth/Forgot Password/verifyForgotOtp.js';
+import { forgotPassword } from '../../../controllers/auth/forgotPassword/forgotPassword.js';
+import { setNewPassword } from '../../../controllers/auth/forgotPassword/setNewPassword.js';
+import { verifyForgotOTP } from '../../../controllers/auth/forgotPassword/verifyForgotOtp.js';
 import { authorize } from '../../../middleware/auth/rbacAuthorize.js';
 import { deleteUser } from '../../../controllers/auth/deleteUser.js';
-import { loginLimit } from '../../../middleware/auth/authLimit.js';
-import { registerLimit } from '../../../middleware/auth/authLimit.js';
+import { loginLimit, registerLimit, otpLimit } from '../../../middleware/auth/authLimit.js';
 import { verifyRefreshToken } from '../../../middleware/auth/verifyRefreshToken.js';
-import { refreshToken } from '../../../controllers/auth/Refresh Token/refreshToken.js';
-import { logoutAll } from '../../../controllers/auth/Refresh Token/logoutAll.js';
+import { refreshToken } from '../../../controllers/auth/refreshToken/refreshToken.js';
+import { logoutAll } from '../../../controllers/auth/refreshToken/logoutAll.js';
 
 const router = express.Router();
 
@@ -122,7 +121,7 @@ router.post('/logout', verifyRefreshToken, logout)
  *       500:
  *         description: Server error
  */
-router.post('/verify-otp', verifyOTP)
+router.post('/verify-otp', otpLimit, verifyOTP)
 
 // reset password
 
@@ -203,20 +202,27 @@ router.post('/forgot-password', forgotPassword)
  *             $ref: '#/components/schemas/OTPVerifyRequest'
  *     responses:
  *       200:
- *         description: OTP verified successfully
+ *         description: OTP verified successfully, returns a resetToken valid for 15 minutes
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: 'string' }
+ *                 resetToken: { type: 'string', description: 'Short-lived JWT token (15min) required to call /set-new-password' }
  *       400:
  *         description: Invalid or expired OTP
  *       500:
  *         description: Server error
  */
-router.post('/verify-forgot-otp', verifyForgotOTP)
+router.post('/verify-forgot-otp', otpLimit, verifyForgotOTP)
 
 /**
  * @swagger
  * /api/v1/auth/set-new-password:
  *   post:
  *     summary: Set new password
- *     description: Set new password after OTP verification
+ *     description: Set a new password using the resetToken received from /verify-forgot-otp. The resetToken expires in 15 minutes.
  *     tags:
  *       - Authentication
  *     requestBody:
@@ -225,15 +231,19 @@ router.post('/verify-forgot-otp', verifyForgotOTP)
  *         application/json:
  *           schema:
  *             type: object
- *             required: ['email', 'newPassword']
+ *             required: ['resetToken', 'newPassword']
  *             properties:
- *               email: { type: 'string', format: 'email' }
- *               newPassword: { type: 'string', minLength: 6 }
+ *               resetToken: { type: 'string', description: 'Token received from /verify-forgot-otp endpoint' }
+ *               newPassword: { type: 'string', minLength: 8, description: 'Must contain uppercase, lowercase, number, and special character' }
  *     responses:
  *       200:
- *         description: Password set successfully
+ *         description: Password reset successful
  *       400:
- *         description: Validation error
+ *         description: Validation error (weak password)
+ *       401:
+ *         description: Invalid or expired reset token
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Server error
  */
@@ -274,7 +284,7 @@ router.get('/profile', protect, profile)
  * /api/v1/auth/delete-user:
  *   delete:
  *     summary: Delete user account
- *     description: Delete the authenticated user's account (requires admin, teacher, or student role)
+ *     description: Delete the authenticated user's account (requires admin, mentor, or student role)
  *     tags:
  *       - Authentication
  *     security:
@@ -292,7 +302,7 @@ router.get('/profile', protect, profile)
 router.delete(
   "/delete-user",
   protect,
-  authorize("admin", "teacher", "student"),
+  authorize("admin", "mentor", "student"),
   deleteUser
 );
 

@@ -33,6 +33,10 @@ const Mentor = sequelize.define('Mentor', {
   profile_picture: {
     type: DataTypes.TEXT
   },
+  province_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   create_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

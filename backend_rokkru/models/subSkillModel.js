@@ -13,9 +13,9 @@ const SubSkill = sequelize.define('SubSkill', {
   },
   sub_skill_name: {
     type: DataTypes.STRING(100),
-    allowNull: true,
+    allowNull: true, 
   },
-  skill_name_kh: {
+  sub_skill_name_kh: {
     type: DataTypes.STRING(100),
     allowNull: true,
   },

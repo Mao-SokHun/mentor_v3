@@ -15,6 +15,10 @@ const MentorSkill = sequelize.define('MentorSkill', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  skill_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   create_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

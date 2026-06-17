@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/config.js';
 
 const MentorPortfolio = sequelize.define('MentorPortfolio', {
-  mentor_id: {
+  user_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     allowNull: false

@@ -5,10 +5,10 @@ const OTP = sequelize.define("OTP", {
   code: {
     type: DataTypes.STRING,
   },
-  expiresAt: {
+  expires_at: {
     type: DataTypes.DATE,
   },
-  UserId: {
+  user_id: {
     type: DataTypes.INTEGER,
   },
 }, {

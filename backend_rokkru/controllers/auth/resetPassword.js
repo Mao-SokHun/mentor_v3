@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../../models/userModel.js";
+import UserSession from "../../models/userSessionModel.js";
 
 export const resetPassword = async (req, res) => {
     try {
@@ -37,8 +38,11 @@ export const resetPassword = async (req, res) => {
         user.password = hashedPassword;
         await user.save();
 
+        // Invalidate all sessions — force logout on all devices
+        await UserSession.destroy({ where: { user_id: userId } });
+
         res.json({
-            message: "Password updated successfully.",
+            message: "Password updated successfully. Please log in again.",
         });
     } catch (err) {
         res.status(500).json({

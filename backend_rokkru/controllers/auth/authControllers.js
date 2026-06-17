@@ -1,7 +1,6 @@
 import User from "../../models/userModel.js";
 import bcrypt from "bcryptjs";
 import {
-  generateToken,
   cookieOptions,
   generateOTP,
 } from "../../utils/auth/auth.js";
@@ -23,6 +22,12 @@ export const register = async (req, res) => {
   try {
     const { email, password, user_type } = req.body;
 
+    if (!email || !password || !user_type) {
+      return res.status(400).json({
+        message: "Please enter all required fields",
+      });
+    }
+
     if (!validateEmail(email)) {
       return res.status(400).json({
         message: "Invalid email format",
@@ -33,12 +38,6 @@ export const register = async (req, res) => {
       return res.status(400).json({
         message:
           "Password must contain uppercase, lowercase, number, special character and be at least 8 characters",
-      });
-    }
-
-    if (!email || !password || !user_type) {
-      return res.status(400).json({
-        message: "Please enter all required fields",
       });
     }
 
@@ -73,7 +72,6 @@ export const register = async (req, res) => {
     const refreshToken = generateRefreshToken(newUser.user_id);
 
     // hash refresh token
-
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
     // create session
@@ -88,10 +86,10 @@ export const register = async (req, res) => {
 
     //   store cookie
     res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("token", accessToken, cookieOptions);
 
     return res.status(201).json({
       message: "Register succesfully",
-      accessToken,
     });
   } catch (error) {
     res.status(500).json({
@@ -148,19 +146,17 @@ export const login = async (req, res) => {
 
     const otp = generateOTP();
 
+    // Delete any existing OTPs for this user to prevent flooding
+    await OTP.destroy({ where: { user_id: user.user_id } });
+
     await OTP.create({
       code: otp,
       user_id: user.user_id,
-      expiresAt: new Date(Date.now() + 5 * 60 * 1000),
+      expires_at: new Date(Date.now() + 5 * 60 * 1000),
     });
 
     try {
-      await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: "Your OTP Code",
-        text: `Your OTP is ${otp}`,
-      });
+      await sendEmail(user.email, otp);
     } catch (emailError) {
       console.error("Email sending failed:", emailError);
       return res.status(500).json({
@@ -182,10 +178,11 @@ export const login = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    req.UserSession.is_revoked = true;
+    req.session.is_revoked = true;
+ 
+    await req.session.save();
 
-    await req.UserSession.save();
-
+    res.clearCookie("token", cookieOptions);
     res.clearCookie("refreshToken", cookieOptions);
 
     return res.status(200).json({ message: "Logged out successfully" });

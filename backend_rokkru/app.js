@@ -1,19 +1,15 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
+
 import { sequelize } from './models/index.js';
 import setupSwagger from './config/swagger.js';
-import mentorRoutes from './routes/v1/mentor/mentors.js';
-
-dotenv.config();
-import authRoutes from './routes/v1/auth/auth.js';
-import userTypesRouter from './routes/v1/userTypes.js';
-import stripeRoutes from './routes/v1/stripe.js';
-import studentRouter from './routes/v1/students.js';
-import { stripeWebhook } from './controllers/stripe/stripeWebhook.js';
+import v1Routes from './routes/v1/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,16 +24,7 @@ app.use(cors({
   credentials: true,
 }));
 
-// Stripe webhook must receive the raw body for signature verification
-app.post(
-  '/api/v1/stripe/webhook',
-  express.raw({ type: 'application/json' }),
-  stripeWebhook,
-);
-
 app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Serve static files from public directory
@@ -69,17 +56,9 @@ app.get('/health', async (req, res) => {
     });
   }
 });
-
+                  
 // API Routes
-app.use('/api/v1/', mentorRoutes);
-app.use('/api/v1/user-types', userTypesRouter);
-app.use('/api/v1/students', studentRouter);
-
-// Auth
-app.use('/api/v1/auth', authRoutes);
-
-// Stripe payments
-app.use('/api/v1/stripe', stripeRoutes);
+app.use('/api/v1', v1Routes);
 
 // Connect to Database and start server
 async function startServer() {

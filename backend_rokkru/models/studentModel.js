@@ -25,13 +25,20 @@ const Student = sequelize.define('Student', {
   description: {
     type: DataTypes.STRING(200)
   },
+  profile_picture: {
+    type: DataTypes.TEXT
+  },
+  province_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   create_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
   },
   update_date: {
     type: DataTypes.DATE
-  }
+  },
 }, {
   tableName: 'student',
   timestamps: false

@@ -1,7 +1,7 @@
 import { protect } from '../../../middleware/auth/auth.js';
 import { authorize } from '../../../middleware/auth/rbacAuthorize.js';
 
-export const mentorAuth = [protect, authorize('mentor', 'teacher')];
+export const mentorAuth = [protect, authorize('mentor')];
 
 export function registerUploadErrorHandler(router) {
   router.use((err, req, res, next) => {

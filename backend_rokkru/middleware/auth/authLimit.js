@@ -22,4 +22,16 @@ export const registerLimit = rateLimit({
 
     standardHeaders: true,
     legacyHeaders: false,
-})
+});
+
+export const otpLimit = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: process.env.OTPLIMIT,
+
+    message: {
+        message: "Too many OTP attempts. Please try again in 15 minutes.",
+    },
+
+    standardHeaders: true,
+    legacyHeaders: false,
+});

@@ -24,9 +24,9 @@ const TransactionDetail = sequelize.define('TransactionDetail', {
   paid_account: {
     type: DataTypes.STRING
   },
-  Account_NO: {
+  account_no: {
     type: DataTypes.INTEGER,
-    field: 'Account_NO'
+    field: 'account_no'
   },
   recive_account: {
     type: DataTypes.STRING,
@@ -35,9 +35,9 @@ const TransactionDetail = sequelize.define('TransactionDetail', {
   remark: {
     type: DataTypes.STRING
   },
-  transactionId: {
+  transaction_id: {
     type: DataTypes.INTEGER,
-    field: 'Transaction ID'
+    field: 'transaction_id'
   }
 }, {
   tableName: 'Transaction_detail',

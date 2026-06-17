@@ -11,9 +11,9 @@ const BakongPayment = sequelize.define('BakongPayment', {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  Bakong_NO_reference: {
+  bakong_no_reference: {
     type: DataTypes.STRING(255),
-    field: 'Bakong_NO_reference'
+    field: 'bakong_no_reference'
   },
   bakong_account_id: {
     type: DataTypes.STRING,

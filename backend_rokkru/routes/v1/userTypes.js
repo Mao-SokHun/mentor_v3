@@ -1,7 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import * as userTypesController from '../../controllers/student_system/userTypesController.js';
-import { getUserTypes, createUserType } from '../../controllers/student_system/userTypesController.js';
+import { getUserTypes, createUserType } from '../../controllers/studentSystem/userTypesController.js';
 /**
  * @swagger
  * /api/v1/user-types:

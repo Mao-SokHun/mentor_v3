@@ -21,7 +21,7 @@ const MentorExperience = sequelize.define(
       type: DataTypes.DATE,
       allowNull: false,
     },
-    mentor_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

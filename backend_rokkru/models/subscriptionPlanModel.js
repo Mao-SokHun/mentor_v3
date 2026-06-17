@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/config.js';
 
 const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
-  subscription_Plan_id: {
+  subscription_plan_id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true
@@ -22,7 +22,7 @@ const SubscriptionPlan = sequelize.define('SubscriptionPlan', {
     type: DataTypes.STRING(255)
   },
 }, {
-  tableName: 'subscription_Plan',
+  tableName: 'subscription_plan',
   timestamps: false
 });
 

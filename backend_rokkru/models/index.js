@@ -25,11 +25,12 @@ import CommunityPost from './communityPostModel.js';
 import CommunityHistory from './communityHistoryModel.js';
 import OTP from './otpModel.js';
 import MentorExperience from './mentorExperienceModel.js';
+import MentorRating from './mentorRatingModel.js';
 // --- Associations ---
 
 // Mentor <-> MentorExperience (One-to-Many)
-Mentor.hasMany(MentorExperience, { foreignKey: 'mentor_id' });
-MentorExperience.belongsTo(Mentor, { foreignKey: 'mentor_id' });
+Mentor.hasMany(MentorExperience, { foreignKey: 'user_id' });
+MentorExperience.belongsTo(Mentor, { foreignKey: 'user_id' });
 
 // User <-> OTP (One-to-Many)
 User.hasMany(OTP, { foreignKey: 'user_id' });
@@ -88,8 +89,8 @@ CommunityPost.hasMany(CommunityHistory, { foreignKey: 'post_com_id' });
 CommunityHistory.belongsTo(CommunityPost, { foreignKey: 'post_com_id' });
 
 // Mentor <-> MentorPortfolio (One-to-Many)
-Mentor.hasMany(MentorPortfolio, { foreignKey: 'mentor_id' });
-MentorPortfolio.belongsTo(Mentor, { foreignKey: 'mentor_id' });
+Mentor.hasMany(MentorPortfolio, { foreignKey: 'user_id' });
+MentorPortfolio.belongsTo(Mentor, { foreignKey: 'user_id' });
 
 // Mentor <-> Subscription (One-to-One)
 Mentor.hasOne(Subscription, { foreignKey: 'user_id' });
@@ -128,8 +129,8 @@ Province.hasMany(MentorPost, { foreignKey: 'province_id' });
 MentorPost.belongsTo(Province, { foreignKey: 'province_id' });
 
 // SubscriptionPlan <-> Subscription (One-to-Many)
-SubscriptionPlan.hasMany(Subscription, { foreignKey: 'subscription_Plan_id' });
-Subscription.belongsTo(SubscriptionPlan, { foreignKey: 'subscription_Plan_id' });
+SubscriptionPlan.hasMany(Subscription, { foreignKey: 'subscription_plan_id' });
+Subscription.belongsTo(SubscriptionPlan, { foreignKey: 'subscription_plan_id' });
 
 // User <-> TransactionDetail (One-to-Many)
 User.hasMany(TransactionDetail, { foreignKey: 'user_id' });
@@ -150,6 +151,14 @@ StripePayment.belongsTo(User, { foreignKey: 'user_id' });
 // Subscription <-> StripePayment (One-to-Many)
 Subscription.hasMany(StripePayment, { foreignKey: 'subscription_id' });
 StripePayment.belongsTo(Subscription, { foreignKey: 'subscription_id' });
+
+// Mentor <-> MentorRating (One-to-Many)
+Mentor.hasMany(MentorRating, { foreignKey: 'mentor_id' });
+MentorRating.belongsTo(Mentor, { foreignKey: 'mentor_id' });
+
+// Student <-> MentorRating (One-to-Many)
+Student.hasMany(MentorRating, { foreignKey: 'student_id' });
+MentorRating.belongsTo(Student, { foreignKey: 'student_id' });
 
 export {
   sequelize,
@@ -177,4 +186,5 @@ export {
   CommunityHistory,
   OTP,
   MentorExperience,
+  MentorRating,
 };

@@ -7,7 +7,7 @@ const Subscription = sequelize.define('Subscription', {
     primaryKey: true,
     autoIncrement: true
   },
-  subscription_Plan_id: {
+  subscription_plan_id: {
     type: DataTypes.INTEGER,
     allowNull: false
   },

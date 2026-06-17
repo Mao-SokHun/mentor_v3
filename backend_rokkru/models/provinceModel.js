@@ -11,6 +11,10 @@ const Province = sequelize.define('Province', {
     type: DataTypes.STRING(50),
     allowNull: false
   },
+  province_name_kh: {
+    type: DataTypes.STRING(100), 
+    allowNull: true, 
+  },
   create_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

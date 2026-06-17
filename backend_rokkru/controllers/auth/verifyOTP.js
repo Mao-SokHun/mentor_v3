@@ -12,6 +12,12 @@ export const verifyOTP = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
+    if (!email || !otp) {
+      return res.status(400).json({
+        message: "Email and OTP are required",
+      });
+    }
+
     // finduser
 
     const user = await User.findOne({
@@ -40,15 +46,14 @@ export const verifyOTP = async (req, res) => {
     }
 
     // expired date
-    if (validOTP.expiresAt < new Date()) {
+    if (validOTP.expires_at < new Date()) {
       return res.status(400).json({
         message: "OTP expired",
       });
     }
 
     // delete OTP after success
-
-    await validOTP.destroy();
+    await OTP.destroy({ where: { user_id: user.user_id } });
 
     // generate access token
 
@@ -57,8 +62,6 @@ export const verifyOTP = async (req, res) => {
     // generate refresh token
 
     const refreshToken = generateRefreshToken(user.user_id);
-
-    // hash refresh token
 
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
@@ -74,10 +77,10 @@ export const verifyOTP = async (req, res) => {
 
     //   store cookie
     res.cookie("refreshToken", refreshToken, cookieOptions);
+    res.cookie("token", accessToken, cookieOptions);
 
     res.json({
       message: "login success",
-      accessToken,
       user: {
         id: user.user_id,
         email: user.email,
