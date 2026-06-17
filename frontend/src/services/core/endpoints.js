@@ -89,6 +89,8 @@ export const ENDPOINTS = {
   },
 
   users: {
+    me: '/v1/users/me',
+    profilePicture: '/v1/users/me/profile-picture',
     list: '/users',
     byId: (id) => `/users/${id}`,
   },

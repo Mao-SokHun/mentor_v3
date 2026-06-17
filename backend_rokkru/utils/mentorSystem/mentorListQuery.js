@@ -34,14 +34,16 @@ export function buildMentorListQuery(req) {
     where.experience_years = { [Op.gte]: minExperience };
   }
 
-  const mentorSkillWhere = {};
-  if (skillId !== null) mentorSkillWhere.skill_id = skillId;
-  if (subSkillId !== null) mentorSkillWhere.sub_skill_id = subSkillId;
-  const filterBySkill = Object.keys(mentorSkillWhere).length > 0;
+  const subSkillWhere = {};
+  if (skillId !== null) subSkillWhere.skill_id = skillId;
+  if (subSkillId !== null) subSkillWhere.sub_skill_id = subSkillId;
+  const filterBySkill = Object.keys(subSkillWhere).length > 0;
 
   const subSkillInclude = {
     model: SubSkill,
     attributes: SUB_SKILL_ATTRS,
+    where: filterBySkill ? subSkillWhere : undefined,
+    required: filterBySkill,
     include: [{ model: Skill, attributes: SKILL_ATTRS }],
   };
 
@@ -49,8 +51,7 @@ export function buildMentorListQuery(req) {
     {
       model: MentorSkill,
       required: filterBySkill,
-      where: filterBySkill ? mentorSkillWhere : undefined,
-      include: [{ model: Skill, attributes: SKILL_ATTRS }, subSkillInclude],
+      include: [subSkillInclude],
     },
   ];
 

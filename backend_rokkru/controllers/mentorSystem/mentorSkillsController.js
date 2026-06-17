@@ -27,10 +27,14 @@ const listSkill = async (req, res) => {
   try {
     const skill = await Skill.findAll({
       attributes: SKILL_ATTRS,
-      include: [{ model: SubSkill, attributes: SUB_SKILL_ATTRS }],
+      include: [{
+        model: SubSkill,
+        attributes: SUB_SKILL_ATTRS,
+        order: [['sub_skill_name', 'ASC']],
+      }],
       order: [['skill_name', 'ASC']],
     });
-    // Return raw DB columns: skill_name (EN), skill_name_kh (KH) — frontend picks label by lang
+    // skill: skill_name / skill_name_kh — sub_skill: sub_skill_name / sub_skill_name_kh
     return ok(res, skill.map((row) => row.get({ plain: true })));
   } catch (error) {
     return fail(res, error.message, 500);

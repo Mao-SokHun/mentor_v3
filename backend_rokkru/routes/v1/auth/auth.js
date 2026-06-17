@@ -141,9 +141,9 @@ router.post('/verify-otp', otpLimit, verifyOTP)
  *         application/json:
  *           schema:
  *             type: object
- *             required: ['currentPassword', 'newPassword']
+ *             required: ['oldPassword', 'newPassword']
  *             properties:
- *               currentPassword: { type: 'string' }
+ *               oldPassword: { type: 'string' }
  *               newPassword: { type: 'string', minLength: 6 }
  *     responses:
  *       200:

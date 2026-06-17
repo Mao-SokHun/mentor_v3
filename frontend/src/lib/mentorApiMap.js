@@ -190,6 +190,27 @@ export function mentorProfileToPayload(profile, provinces = []) {
   }
 }
 
+/** Shared user fields → PUT /v1/users/me */
+export function userProfilePayloadFromMentor(profile, provinces = []) {
+  const provinceId = resolveProvinceIdFromProfile(profile, provinces)
+  return {
+    ...mentorNamesUiToDb(profile),
+    phone_number: getPhoneDigits(profile.phone) || undefined,
+    province_id: provinceId,
+  }
+}
+
+/** Mentor-only fields → PUT /v1/mentors/:userId */
+export function mentorOnlyPayload(profile, provinces = []) {
+  const years = profile.experienceYears
+  const parsedYears = years != null && years !== '' ? parseInt(String(years), 10) : NaN
+  return {
+    gender: profile.gender?.trim() || undefined,
+    experience_years: Number.isNaN(parsedYears) ? undefined : parsedYears,
+    description: buildMentorDescription(profile),
+  }
+}
+
 /** Primary experience row for ExperienceSection from work + years fields. */
 export function buildExperienceFromWork(
   { workPosition = '', workOrganization = '', experienceYears } = {},

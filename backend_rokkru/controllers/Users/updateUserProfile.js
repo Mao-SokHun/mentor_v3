@@ -57,7 +57,7 @@ export const updateUserProfile = async (req, res) => {
                 description,
             })
         }
-        else if (role === "teacher") {
+        else if (role === "mentor") {
             const mentor = await Mentor.findByPk(userId)
 
             if (!mentor) {

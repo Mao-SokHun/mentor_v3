@@ -136,6 +136,228 @@ const options = {
             error: { type: "string", example: "Portfolio item not found" },
           },
         },
+        Mentor: {
+          type: "object",
+          properties: {
+            user_id: { type: "integer", example: 136 },
+            firstname: { type: "string", example: "Sok" },
+            lastname: { type: "string", example: "Dara" },
+            gender: { type: "string", example: "male" },
+            phone_number: { type: "string", example: "+85512345678" },
+            province_id: { type: "integer", example: 1 },
+            experience_years: { type: "integer", example: 5 },
+            profile_view_count: { type: "integer", example: 42 },
+            description: { type: "string", example: "Full-stack mentor specializing in React." },
+            profile_picture: {
+              type: "string",
+              example: "http://localhost:3000/api/v1/profile-pictures/136/avatar.webp",
+            },
+            create_date: { type: "string", format: "date-time" },
+            update_date: { type: "string", format: "date-time" },
+            Province: { $ref: "#/components/schemas/Province" },
+          },
+        },
+        MentorCreateRequest: {
+          type: "object",
+          properties: {
+            firstname: { type: "string", example: "Sok" },
+            lastname: { type: "string", example: "Dara" },
+            gender: { type: "string", example: "male" },
+            phone_number: { type: "string", example: "+85512345678" },
+            province_id: { type: "integer", example: 1 },
+            experience_years: { type: "integer", example: 5 },
+            description: { type: "string", example: "Full-stack mentor." },
+          },
+        },
+        MentorUpdateRequest: {
+          type: "object",
+          properties: {
+            firstname: { type: "string" },
+            lastname: { type: "string" },
+            gender: { type: "string" },
+            phone_number: { type: "string" },
+            province_id: { type: "integer" },
+            experience_years: { type: "integer" },
+            description: { type: "string" },
+            profile_picture: { type: "string" },
+          },
+        },
+        MentorListResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              properties: {
+                item: { type: "array", items: { $ref: "#/components/schemas/Mentor" } },
+                total: { type: "integer", example: 100 },
+                page: { type: "integer", example: 1 },
+                limit: { type: "integer", example: 10 },
+              },
+            },
+          },
+        },
+        Province: {
+          type: "object",
+          properties: {
+            province_id: { type: "integer", example: 1 },
+            province_id: { type: "integer", example: 1 },
+            province_name_en: { type: "string", example: "Phnom Penh" },
+            province_name_kh: { type: "string", example: "ភ្នំពេញ" },
+          },
+        },
+        Skill: {
+          type: "object",
+          properties: {
+            skill_id: { type: "integer", example: 1 },
+            skill_name: { type: "string", example: "Programming" },
+            skill_name_kh: { type: "string", example: "ការសរសេរកូដ" },
+            SubSkills: {
+              type: "array",
+              items: { $ref: "#/components/schemas/SubSkill" },
+            },
+          },
+        },
+        SubSkill: {
+          type: "object",
+          properties: {
+            sub_skill_id: { type: "integer", example: 10 },
+            skill_id: { type: "integer", example: 1 },
+            sub_skill_name: { type: "string", example: "React" },
+            sub_skill_name_kh: { type: "string", example: "រ៉េក" },
+            Skill: { $ref: "#/components/schemas/Skill" },
+          },
+        },
+        MentorSkill: {
+          type: "object",
+          properties: {
+            ms_id: { type: "integer", example: 1 },
+            user_id: { type: "integer", example: 136 },
+            skill_id: { type: "integer", example: 1 },
+            sub_skill_id: { type: "integer", example: 10 },
+            Skill: { $ref: "#/components/schemas/Skill" },
+            SubSkill: { $ref: "#/components/schemas/SubSkill" },
+            create_date: { type: "string", format: "date-time" },
+          },
+        },
+        MentorSkillAddRequest: {
+          type: "object",
+          required: ["sub_skill_id"],
+          properties: {
+            sub_skill_id: { type: "integer", example: 10 },
+            skill_id: {
+              type: "integer",
+              example: 1,
+              description: "Optional. Must match sub_skill parent if provided.",
+            },
+          },
+        },
+        MentorExperience: {
+          type: "object",
+          properties: {
+            mentor_experience_id: { type: "integer", example: 1 },
+            mentor_id: { type: "integer", example: 136 },
+            mentor_position: { type: "string", example: "Senior Developer" },
+            mentor_organization: { type: "string", example: "Tech Corp" },
+            mentor_year: { type: "string", format: "date", example: "2020-01-01" },
+            experience_type: {
+              type: "string",
+              enum: ["education", "work"],
+              example: "work",
+            },
+          },
+        },
+        MentorExperienceCreateRequest: {
+          type: "object",
+          required: ["mentor_position", "mentor_organization", "mentor_year"],
+          properties: {
+            mentor_position: { type: "string", example: "Senior Developer" },
+            mentor_organization: { type: "string", example: "Tech Corp" },
+            mentor_year: {
+              type: "string",
+              example: "2020",
+              description: "Year (YYYY) or ISO date string.",
+            },
+            experience_type: {
+              type: "string",
+              enum: ["education", "work"],
+              default: "education",
+            },
+          },
+        },
+        MentorExperienceUpdateRequest: {
+          type: "object",
+          properties: {
+            mentor_position: { type: "string" },
+            mentor_organization: { type: "string" },
+            mentor_year: { type: "string" },
+            experience_type: { type: "string", enum: ["education", "work"] },
+          },
+        },
+        MentorPost: {
+          type: "object",
+          properties: {
+            post_id: { type: "integer", example: 1 },
+            user_id: { type: "integer", example: 136 },
+            province_id: { type: "integer", example: 1 },
+            sub_skill_id: { type: "integer", example: 10 },
+            title: { type: "string", example: "React mentorship available" },
+            description: { type: "string", example: "Weekly sessions for beginners." },
+            status: { type: "string", enum: ["draft", "published"], example: "published" },
+            create_date: { type: "string", format: "date-time" },
+            update_date: { type: "string", format: "date-time" },
+            SubSkill: { $ref: "#/components/schemas/SubSkill" },
+            Province: { $ref: "#/components/schemas/Province" },
+          },
+        },
+        MentorPostCreateRequest: {
+          type: "object",
+          required: ["title", "province_id", "sub_skill_id"],
+          properties: {
+            title: { type: "string", example: "React mentorship available" },
+            description: { type: "string", example: "Weekly sessions for beginners." },
+            province_id: { type: "integer", example: 1 },
+            sub_skill_id: { type: "integer", example: 10 },
+            status: { type: "string", enum: ["draft", "published"], default: "draft" },
+          },
+        },
+        MentorPostUpdateRequest: {
+          type: "object",
+          properties: {
+            title: { type: "string" },
+            description: { type: "string" },
+            province_id: { type: "integer" },
+            sub_skill_id: { type: "integer" },
+            status: { type: "string", enum: ["draft", "published"] },
+          },
+        },
+        MentorCatalogResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              properties: {
+                skills: { type: "array", items: { $ref: "#/components/schemas/Skill" } },
+                provinces: { type: "array", items: { $ref: "#/components/schemas/Province" } },
+              },
+            },
+          },
+        },
+        ProfileViewResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            data: {
+              type: "object",
+              properties: {
+                recorded: { type: "boolean", example: true },
+                reason: { type: "string", example: "self_view" },
+                profile_view_count: { type: "integer", example: 43 },
+              },
+            },
+          },
+        },
         PortfolioFile: {
           type: "object",
           properties: {

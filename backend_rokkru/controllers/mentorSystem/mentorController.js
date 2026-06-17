@@ -26,7 +26,7 @@ const MENTOR_WRITABLE_FIELDS = [
 const MENTOR_CREATE_FIELDS = MENTOR_WRITABLE_FIELDS;
 
 const MENTOR_READ_INCLUDE = [
-  { model: Province, attributes: ['province_id', 'province_name'] },
+  { model: Province, attributes: ['province_id', 'province_name', 'province_name_kh'] },
 ];
 
 function pickBodyFields(body, fields) {

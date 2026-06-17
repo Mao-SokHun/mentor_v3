@@ -13,5 +13,10 @@ const listAllProvinces = async (req, res) => {
   }
 };
 
+
+
+
+
+
 export { listAllProvinces };
 // ============= End province controller =============

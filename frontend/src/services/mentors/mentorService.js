@@ -6,6 +6,8 @@ import { filterMentors } from '@/utils/filterMentors'
 import {
   mentorRowToProfile as mapMentorRowToProfile,
   mentorProfileToPayload,
+  userProfilePayloadFromMentor,
+  mentorOnlyPayload,
 } from '@/lib/mentorApiMap'
 import {
   applyMentorSkillRows,
@@ -18,6 +20,10 @@ import { compareTimeSortKeys } from '@/utils/timeRangeUtils'
 import { FILTER_ALL } from '@/constants'
 import { provinceRowLabel } from '@/utils/provinceOptions'
 import { isValidPortfolioUrl, classifyPortfolioEntryMode } from '@/utils/portfolioUtils'
+import {
+  updateUserProfile as saveSharedUserProfile,
+  uploadUserProfilePicture,
+} from '../users/userProfileService'
 
 export { isValidPortfolioUrl, hasInvalidPortfolioLinks } from '@/utils/portfolioUtils'
 
@@ -71,6 +77,7 @@ export async function saveMentorFromOnboarding(profile, userId) {
   if (!isApiEnabled()) return null
 
   const body = toMentorPayload(profile)
+  const userBody = userProfilePayloadFromMentor(profile)
   const id = userId ?? getStoredUser()?.id
 
   try {
@@ -85,10 +92,11 @@ export async function saveMentorFromOnboarding(profile, userId) {
       err.status === 409 ||
       (err.status === 400 && /already exists/i.test(String(err.message ?? '')))
     if (duplicate && id) {
+      await saveSharedUserProfile(userBody)
       return unwrapApiData(
         await apiRequest(MENTOR_API.byId(id), {
           method: 'PUT',
-          body: JSON.stringify(body),
+          body: JSON.stringify(mentorOnlyPayload(profile)),
         })
       )
     }
@@ -325,35 +333,38 @@ export async function recordMentorProfileView(userId) {
   )
 }
 
-/** POST /mentors/:userId/profile-picture — upload mentor avatar image */
-export async function uploadMentorProfilePicture(userId, file) {
-  if (!isApiEnabled() || !userId || !file) return null
-  const form = new FormData()
-  form.append('file', file)
-  return unwrapApiData(
-    await apiFormRequest(MENTOR_API.profilePicture(userId), form, { method: 'POST' })
-  )
+/** PUT /users/me/profile-picture — upload mentor avatar via shared Users API */
+export async function uploadMentorProfilePicture(_userId, file) {
+  if (!isApiEnabled() || !file) return null
+  const uploaded = await uploadUserProfilePicture(file)
+  return uploaded?.profile_picture ? { profile_picture: uploaded.profile_picture } : uploaded
 }
 
-/** PUT /mentor/edit-profile — update mentor profile (POST if row missing) */
+/** Update mentor profile — shared fields via Users, mentor fields via /mentors */
 export async function updateMentorProfile(userId, profile, provinces = []) {
   if (!isApiEnabled()) return null
-  const body = toMentorPayload(profile, provinces)
+  const userBody = userProfilePayloadFromMentor(profile, provinces)
+  const mentorBody = mentorOnlyPayload(profile, provinces)
+  const fullBody = toMentorPayload(profile, provinces)
+
   try {
+    await saveSharedUserProfile(userBody)
     return unwrapApiData(
       await apiRequest(MENTOR_API.byId(userId), {
         method: 'PUT',
-        body: JSON.stringify(body),
+        body: JSON.stringify(mentorBody),
       })
     )
   } catch (err) {
     if (err?.status === 400 || err?.status === 404) {
-      return unwrapApiData(
+      const created = unwrapApiData(
         await apiRequest(MENTOR_API.create, {
           method: 'POST',
-          body: JSON.stringify(body),
+          body: JSON.stringify(fullBody),
         })
       )
+      await saveSharedUserProfile(userBody).catch(() => null)
+      return created
     }
     throw err
   }

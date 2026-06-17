@@ -15,7 +15,11 @@ import { getAuthUserId } from '../../utils/mentorSystem/getAuthUserId.js';
 import { serializePortfolioItem } from '../../utils/mentorSystem/portfolioHelpers.js';
 import { buildMyAnalyticsPayload } from '../../utils/mentorSystem/mentorAnalyticsPayload.js';
 
-const skillCatalogInclude = [{ model: SubSkill, attributes: SUB_SKILL_ATTRS }];
+const skillCatalogInclude = [{
+  model: SubSkill,
+  attributes: SUB_SKILL_ATTRS,
+  order: [['sub_skill_name', 'ASC']],
+}];
 
 const mentorSkillInclude = [
   { model: Skill, attributes: SKILL_ATTRS },
@@ -91,7 +95,9 @@ const getMyEditProfile = async (req, res) => {
 
     const [mentor, portfolioRows, experienceRows, mentorSkills, skills, provinces] =
       await Promise.all([
-        Mentor.findByPk(userId),
+        Mentor.findByPk(userId, {
+          include: [{ model: Province, attributes: ['province_id', 'province_name', 'province_name_kh'] }],
+        }),
         MentorPortfolio.findAll({
           where: { user_id: userId },
           order: [
