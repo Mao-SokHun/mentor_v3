@@ -40,32 +40,6 @@ router.get('/portfolio-files/:mentorId/:filename', portfolioController.servePort
 
 /**
  * @swagger
- * /api/v1/profile-pictures/{userId}/{filename}:
- *   get:
- *     summary: Get mentor profile picture
- *     description: Public profile image file for a mentor.
- *     tags: [Mentors - Public]
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema: { type: integer }
- *       - in: path
- *         name: filename
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Image file
- *       400:
- *         description: Invalid user id
- *       404:
- *         description: File not found
- */
-router.get('/profile-pictures/:userId/:filename', mentorController.serveProfilePicture);
-
-/**
- * @swagger
  * /api/v1/mentors/catalog:
  *   get:
  *     summary: Get skills and provinces catalog

@@ -8,6 +8,8 @@ import {
   mentorProfileToPayload,
   userProfilePayloadFromMentor,
   mentorOnlyPayload,
+  userProfileRowToMentorUi,
+  mentorOnlyFieldsFromRow,
 } from '@/lib/mentorApiMap'
 import {
   applyMentorSkillRows,
@@ -23,6 +25,7 @@ import { isValidPortfolioUrl, classifyPortfolioEntryMode } from '@/utils/portfol
 import {
   updateUserProfile as saveSharedUserProfile,
   uploadUserProfilePicture,
+  fetchUserProfile,
 } from '../users/userProfileService'
 
 export { isValidPortfolioUrl, hasInvalidPortfolioLinks } from '@/utils/portfolioUtils'
@@ -187,22 +190,22 @@ export async function fetchMentorWithSkills(userId) {
   return applyMentorSkillRows(mentor, skills)
 }
 
-/** Logged-in mentor UI profile merged with mentor_skills table. */
+/** Logged-in mentor UI profile — shared fields from Users, mentor fields from /mentors/me. */
 export async function fetchMyMentorProfileForUi(user) {
   if (!isApiEnabled()) return resolveMentorProfile(user)
   const userId = user?.id
   if (!userId) return resolveMentorProfile(user)
 
-  const [mentorRow, skills, catalog] = await Promise.all([
+  const [userProfile, mentorRow, skills, catalog] = await Promise.all([
+    fetchUserProfile().catch(() => null),
     fetchMyMentorProfile().catch(() => null),
     fetchMentorSkills(userId).catch(() => []),
     fetchMentorCatalog().catch(() => ({ skills: [], provinces: [] })),
   ])
   const provinces = Array.isArray(catalog?.provinces) ? catalog.provinces : []
 
-  const base = mentorRow
-    ? mentorRowToProfile(mentorRow, user, provinces)
-    : resolveMentorProfile(user)
+  const shared = userProfileRowToMentorUi(userProfile, resolveMentorProfile(user))
+  const base = mentorOnlyFieldsFromRow(mentorRow, shared)
   return applyMentorSkillRows(
     {
       ...base,
@@ -245,7 +248,7 @@ export async function fetchMyMentorDashboard() {
   }
 }
 
-/** GET /v1/mentors/me/edit-profile — one request for edit-profile page load */
+/** Edit-profile page — GET /users/me (shared) + GET /mentors/me/edit-profile (mentor bundle). */
 export async function fetchEditProfileBundle(user) {
   if (!isApiEnabled()) {
     return {
@@ -271,14 +274,22 @@ export async function fetchEditProfileBundle(user) {
     }
   }
 
-  const data = unwrapApiData(await apiRequest(MENTOR_API.myEditProfile)) ?? {}
+  const [userProfile, data] = await Promise.all([
+    fetchUserProfile().catch(() => null),
+    apiRequest(MENTOR_API.myEditProfile)
+      .then((json) => unwrapApiData(json) ?? {})
+      .catch(() => ({})),
+  ])
+
   const mentorSkills = Array.isArray(data.mentorSkills) ? data.mentorSkills : []
   const provinces = Array.isArray(data.catalog?.provinces) ? data.catalog.provinces : []
-  const base = data.profile
-    ? mentorRowToProfile(data.profile, user, provinces)
-    : resolveMentorProfile(user)
+  const shared = userProfileRowToMentorUi(userProfile, resolveMentorProfile(user))
+  const withMentor = mentorOnlyFieldsFromRow(data.profile, shared)
   const profile = applyMentorSkillRows(
-    { ...base, subjects: base.subject ? [base.subject] : [] },
+    {
+      ...withMentor,
+      subjects: withMentor.subject ? [withMentor.subject] : [],
+    },
     mentorSkills
   )
   const portfolio = Array.isArray(data.portfolio)

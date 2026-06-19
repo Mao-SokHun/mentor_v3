@@ -9,7 +9,7 @@ import {
   SubSkill,
   Province,
 } from '../../models/index.js';
-import { SKILL_ATTRS, SUB_SKILL_ATTRS } from '../../utils/mentorSystem/skillDisplayName.js';
+import { SKILL_ATTRS, SUB_SKILL_ATTRS, PROVINCE_ATTRS } from '../../utils/mentorSystem/skillDisplayName.js';
 import { ok, fail } from '../../utils/mentorSystem/apiResponse.js';
 import { getAuthUserId } from '../../utils/mentorSystem/getAuthUserId.js';
 import { serializePortfolioItem } from '../../utils/mentorSystem/portfolioHelpers.js';
@@ -31,8 +31,12 @@ const mentorSkillInclude = [
 ];
 
 const postInclude = [
-  { model: SubSkill, include: [{ model: Skill }] },
-  { model: Province },
+  {
+    model: SubSkill,
+    attributes: SUB_SKILL_ATTRS,
+    include: [{ model: Skill, attributes: SKILL_ATTRS }],
+  },
+  { model: Province, attributes: PROVINCE_ATTRS },
 ];
 
 async function loadSkillsCatalog() {
@@ -45,7 +49,10 @@ async function loadSkillsCatalog() {
 }
 
 async function loadProvinces() {
-  const rows = await Province.findAll({ order: [['province_name', 'ASC']] });
+  const rows = await Province.findAll({
+    attributes: PROVINCE_ATTRS,
+    order: [['province_name', 'ASC']],
+  });
   return rows.map((row) => row.get({ plain: true }));
 }
 
@@ -96,7 +103,7 @@ const getMyEditProfile = async (req, res) => {
     const [mentor, portfolioRows, experienceRows, mentorSkills, skills, provinces] =
       await Promise.all([
         Mentor.findByPk(userId, {
-          include: [{ model: Province, attributes: ['province_id', 'province_name', 'province_name_kh'] }],
+          include: [{ model: Province, attributes: PROVINCE_ATTRS }],
         }),
         MentorPortfolio.findAll({
           where: { user_id: userId },

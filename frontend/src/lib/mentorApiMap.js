@@ -197,6 +197,7 @@ export function userProfilePayloadFromMentor(profile, provinces = []) {
     ...mentorNamesUiToDb(profile),
     phone_number: getPhoneDigits(profile.phone) || undefined,
     province_id: provinceId,
+    description: buildMentorDescription(profile),
   }
 }
 
@@ -207,7 +208,6 @@ export function mentorOnlyPayload(profile, provinces = []) {
   return {
     gender: profile.gender?.trim() || undefined,
     experience_years: Number.isNaN(parsedYears) ? undefined : parsedYears,
-    description: buildMentorDescription(profile),
   }
 }
 
@@ -240,6 +240,53 @@ function provinceNameFromMentorRow(mentor, provinces = []) {
     if (hit) return String(hit.province_name ?? hit.name ?? '').trim()
   }
   return String(mentor?.address ?? '').trim()
+}
+
+/** Map GET /v1/users/me `user` payload → mentor UI profile (shared fields). */
+export function userProfileRowToMentorUi(userRow = {}, base = {}) {
+  if (!userRow || typeof userRow !== 'object') return { ...base }
+
+  const { firstName, lastName } = mentorNamesDbToUi(userRow, base)
+  const provinceRow = userRow.province ?? null
+  const provinceId =
+    userRow.province_id ?? provinceRow?.province_id ?? base.provinceId ?? null
+  const province =
+    String(provinceRow?.province_name ?? userRow.address ?? base.province ?? '').trim() ||
+    base.province
+
+  return {
+    ...base,
+    firstName,
+    lastName,
+    displayName: formatMentorDisplayName({ firstName, lastName }) || base.displayName,
+    name: formatMentorDisplayName({ firstName, lastName }) || base.name,
+    phone: userRow.phone_number ?? base.phone,
+    province,
+    provinceId,
+    provinceRow,
+    bio: userRow.description ?? base.bio,
+    profilePicture: userRow.profile_picture ?? base.profilePicture,
+    avatarUrl:
+      userRow.profile_picture ?? base.avatarUrl ?? base.profilePicture ?? null,
+    email: userRow.email ?? base.email,
+  }
+}
+
+/** Mentor-only fields from mentor table row (gender, experience, legacy description parse). */
+export function mentorOnlyFieldsFromRow(mentor, base = {}) {
+  if (!mentor) return { ...base }
+
+  const parsed = parseMentorDescription(mentor.description ?? '')
+
+  return {
+    ...base,
+    gender: mentor.gender ?? base.gender,
+    experienceYears: mentor.experience_years ?? base.experienceYears ?? null,
+    major: parsed.major || base.major,
+    subject: parsed.subject || base.subject,
+    workOrganization: parsed.workOrganization || base.workOrganization,
+    workPosition: parsed.workPosition || base.workPosition,
+  }
 }
 
 /** Merge experience card + teaching fields from API mentor row. */

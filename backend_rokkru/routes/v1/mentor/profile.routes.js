@@ -4,8 +4,6 @@ import * as mentorController from '../../../controllers/mentorSystem/mentorContr
 import * as analyticsController from '../../../controllers/mentorSystem/mentorAnalyticsController.js';
 import * as postsController from '../../../controllers/mentorSystem/mentorPostsController.js';
 import * as bundleController from '../../../controllers/mentorSystem/mentorBundleController.js';
-import { profilePictureUpload } from '../../../middleware/mentorSystem/profilePictureUpload.js';
-
 const router = Router();
 
 /**
@@ -121,8 +119,8 @@ router.get('/mentors/me/posts', ...mentorAuth, postsController.listMyPosts);
  * @swagger
  * /api/v1/mentors:
  *   post:
- *     summary: Create mentor profile
- *     description: Creates profile for the authenticated mentor user.
+ *     summary: Create mentor profile row
+ *     description: Creates mentor-specific row. Shared fields (name, phone, province, description, avatar) use /api/v1/users/me.
  *     tags: [Mentors - Profile]
  *     security:
  *       - bearerAuth: []
@@ -165,11 +163,13 @@ router.post('/mentors', ...mentorAuth, mentorController.createMentor);
  *       content:
  *         application/json:
  *           schema: { $ref: '#/components/schemas/MentorPostUpdateRequest' }
- *     responses:
- *       200:
- *         description: Post updated
- *       403:
- *         description: Forbidden — not post owner
+     *     responses:
+     *       200:
+     *         description: Post updated
+     *       401:
+     *         description: Unauthorized — login and Authorize with JWT (Bearer)
+     *       403:
+     *         description: Forbidden — not post owner or invalid role
  *       404:
  *         description: Post not found
  */
@@ -228,7 +228,8 @@ router.get('/mentors/:userId', mentorController.getMentorById);
  * @swagger
  * /api/v1/mentors/{userId}:
  *   put:
- *     summary: Update mentor profile
+ *     summary: Update mentor-specific profile fields
+ *     description: Updates gender and experience_years only. Shared fields (name, phone, province, description, avatar) use PUT /api/v1/users/me.
  *     tags: [Mentors - Profile]
  *     security:
  *       - bearerAuth: []
@@ -245,60 +246,13 @@ router.get('/mentors/:userId', mentorController.getMentorById);
  *       200:
  *         description: Mentor updated
  *       400:
- *         description: No fields to update
+ *         description: No mentor-specific fields to update
  *       403:
  *         description: Forbidden — not profile owner
  *       404:
  *         description: Mentor not found
  */
 router.put('/mentors/:userId', ...mentorAuth, mentorController.updateMentor);
-
-/**
- * @swagger
- * /api/v1/mentors/{userId}/profile-picture:
- *   post:
- *     summary: Upload mentor profile picture
- *     tags: [Mentors - Profile]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: userId
- *         required: true
- *         schema: { type: integer }
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required: [file]
- *             properties:
- *               file:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Profile picture uploaded
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success: { type: boolean }
- *                 data:
- *                   type: object
- *                   properties:
- *                     profile_picture: { type: string }
- *       400:
- *         description: File required
- */
-router.post(
-  '/mentors/:userId/profile-picture',
-  ...mentorAuth,
-  profilePictureUpload.single('file'),
-  mentorController.uploadProfilePicture
-);
 
 /**
  * @swagger

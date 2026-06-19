@@ -3,10 +3,15 @@ import { MentorPost, SubSkill, Skill, Province } from '../../models/index.js';
 import { ok, fail } from '../../utils/mentorSystem/apiResponse.js';
 import { parseUserID as parseUserId, assertOwner } from '../../utils/mentorSystem/assertOwner.js';
 import { getAuthUserId } from '../../utils/mentorSystem/getAuthUserId.js';
+import { SKILL_ATTRS, SUB_SKILL_ATTRS, PROVINCE_ATTRS } from '../../utils/mentorSystem/skillDisplayName.js';
 
 const postInclude = [
-    { model: SubSkill, include: [{ model: Skill }] },
-    { model: Province },
+  {
+    model: SubSkill,
+    attributes: SUB_SKILL_ATTRS,
+    include: [{ model: Skill, attributes: SKILL_ATTRS }],
+  },
+  { model: Province, attributes: PROVINCE_ATTRS },
 ];
 
 function normalizePostStatus(status) {

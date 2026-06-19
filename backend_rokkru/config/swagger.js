@@ -150,7 +150,7 @@ const options = {
             description: { type: "string", example: "Full-stack mentor specializing in React." },
             profile_picture: {
               type: "string",
-              example: "http://localhost:3000/api/v1/profile-pictures/136/avatar.webp",
+              example: "https://res.cloudinary.com/example/image/upload/v1/avatar.webp",
             },
             create_date: { type: "string", format: "date-time" },
             update_date: { type: "string", format: "date-time" },
@@ -159,27 +159,20 @@ const options = {
         },
         MentorCreateRequest: {
           type: "object",
+          description:
+            "Creates a mentor row with mentor-specific fields. Shared profile fields use /api/v1/users/me.",
           properties: {
-            firstname: { type: "string", example: "Sok" },
-            lastname: { type: "string", example: "Dara" },
             gender: { type: "string", example: "male" },
-            phone_number: { type: "string", example: "+85512345678" },
-            province_id: { type: "integer", example: 1 },
             experience_years: { type: "integer", example: 5 },
-            description: { type: "string", example: "Full-stack mentor." },
           },
         },
         MentorUpdateRequest: {
           type: "object",
+          description:
+            "Mentor-specific fields only. Shared fields use PUT /api/v1/users/me.",
           properties: {
-            firstname: { type: "string" },
-            lastname: { type: "string" },
-            gender: { type: "string" },
-            phone_number: { type: "string" },
-            province_id: { type: "integer" },
-            experience_years: { type: "integer" },
-            description: { type: "string" },
-            profile_picture: { type: "string" },
+            gender: { type: "string", example: "male" },
+            experience_years: { type: "integer", example: 5 },
           },
         },
         MentorListResponse: {
@@ -201,8 +194,7 @@ const options = {
           type: "object",
           properties: {
             province_id: { type: "integer", example: 1 },
-            province_id: { type: "integer", example: 1 },
-            province_name_en: { type: "string", example: "Phnom Penh" },
+            province_name: { type: "string", example: "Phnom Penh" },
             province_name_kh: { type: "string", example: "ភ្នំពេញ" },
           },
         },

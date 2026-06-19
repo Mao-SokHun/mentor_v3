@@ -1,32 +1,19 @@
-import path from 'path';
-import fs from 'fs/promises';
 import { Mentor, Province } from '../../models/index.js';
 import { ok, fail } from '../../utils/mentorSystem/apiResponse.js';
 import { parseUserID, assertOwner } from '../../utils/mentorSystem/assertOwner.js';
 import { getAuthUserId } from '../../utils/mentorSystem/getAuthUserId.js';
 import { buildMentorListQuery } from '../../utils/mentorSystem/mentorListQuery.js';
 import { deleteMentorRelatedData } from '../../utils/mentorSystem/mentorDeleteHelpers.js';
-import {
-  buildProfilePictureUrl,
-  removeStoredProfilePicture,
-  resolveProfilePicturePath,
-} from '../../utils/mentorSystem/profilePictureHelpers.js';
+import { PROVINCE_ATTRS } from '../../utils/mentorSystem/skillDisplayName.js';
 
-const MENTOR_WRITABLE_FIELDS = [
-  'firstname',
-  'lastname',
-  'gender',
-  'phone_number',
-  'province_id',
-  'experience_years',
-  'description',
-  'profile_picture',
-];
+/** Shared profile fields — use /api/v1/users/me (Users controller). */
+const MENTOR_UPDATE_FIELDS = ['gender', 'experience_years'];
 
-const MENTOR_CREATE_FIELDS = MENTOR_WRITABLE_FIELDS;
+/** Bootstrap mentor row — shared fields are set via Users API. */
+const MENTOR_CREATE_FIELDS = ['gender', 'experience_years'];
 
 const MENTOR_READ_INCLUDE = [
-  { model: Province, attributes: ['province_id', 'province_name', 'province_name_kh'] },
+  { model: Province, attributes: PROVINCE_ATTRS },
 ];
 
 function pickBodyFields(body, fields) {
@@ -46,9 +33,6 @@ function parseOptionalIntField(value) {
 
 function normalizeMentorBody(body, fields) {
   const picked = pickBodyFields(body, fields);
-  if (picked.province_id !== undefined) {
-    picked.province_id = parseOptionalIntField(picked.province_id);
-  }
   if (picked.experience_years !== undefined) {
     picked.experience_years = parseOptionalIntField(picked.experience_years);
   }
@@ -136,9 +120,9 @@ const updateMentor = async (req, res) => {
     const result = await findMentorByUserId(userId);
     if (result.error) return fail(res, result.error, result.status);
 
-    const updates = normalizeMentorBody(req.body, MENTOR_WRITABLE_FIELDS);
+    const updates = normalizeMentorBody(req.body, MENTOR_UPDATE_FIELDS);
     if (Object.keys(updates).length === 0) {
-      return fail(res, 'No fields to update', 400);
+      return fail(res, 'No mentor-specific fields to update', 400);
     }
     updates.update_date = new Date();
     await result.mentor.update(updates);
@@ -165,59 +149,6 @@ const deleteMentor = async (req, res) => {
   }
 };
 
-const serveProfilePicture = async (req, res) => {
-  try {
-    const userId = parseUserID(req.params.userId);
-    if (userId === null) return fail(res, 'Invalid user id', 400);
-
-    const resolved = resolveProfilePicturePath(userId, req.params.filename);
-    if (resolved.error) return fail(res, resolved.error, 400);
-
-    try {
-      await fs.access(resolved.filePath);
-    } catch {
-      return fail(res, 'File not found', 404);
-    }
-
-    return res.sendFile(path.resolve(resolved.filePath));
-  } catch (error) {
-    return fail(res, error.message, 500);
-  }
-};
-
-const uploadProfilePicture = async (req, res) => {
-  const userId = parseUserID(req.params.userId);
-  try {
-    if (!assertOwner(req, res, req.params.userId)) return;
-    if (!req.file?.filename) return fail(res, 'Profile image file is required', 400);
-
-    const mentor = await Mentor.findByPk(userId);
-    if (!mentor) return fail(res, 'Mentor not found', 404);
-
-    const previous = mentor.profile_picture;
-    const pictureUrl = buildProfilePictureUrl(req, userId, req.file.filename);
-
-    await mentor.update({
-      profile_picture: pictureUrl,
-      update_date: new Date(),
-    });
-
-    if (previous && previous !== pictureUrl) {
-      await removeStoredProfilePicture(userId, previous);
-    }
-
-    return ok(res, { profile_picture: pictureUrl });
-  } catch (error) {
-    if (req.file?.filename && userId !== null) {
-      await removeStoredProfilePicture(
-        userId,
-        buildProfilePictureUrl(req, userId, req.file.filename)
-      );
-    }
-    return fail(res, error.message, 500);
-  }
-};
-
 export {
   listMentors,
   searchMentors,
@@ -226,6 +157,4 @@ export {
   createMentor,
   updateMentor,
   deleteMentor,
-  uploadProfilePicture,
-  serveProfilePicture,
 };

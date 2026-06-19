@@ -46,3 +46,6 @@ export const SUB_SKILL_ATTRS = [
   'sub_skill_name',
   'sub_skill_name_kh',
 ];
+
+/** Columns on `province` table. */
+export const PROVINCE_ATTRS = ['province_id', 'province_name', 'province_name_kh'];

@@ -1,4 +1,6 @@
 import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import {
   MentorPortfolio,
   MentorSkill,
@@ -6,12 +8,15 @@ import {
   MentorExperience,
 } from '../../models/index.js';
 import { portfolioUploadDir } from '../../middleware/mentorSystem/portfolioUpload.js';
-import { profilePictureUploadDir } from '../../middleware/mentorSystem/profilePictureUpload.js';
 import {
   getAttachmentsFromItem,
   deletePortfolioFilesForItem,
 } from './portfolioHelpers.js';
-import { removeStoredProfilePicture } from './profilePictureHelpers.js';
+
+const LEGACY_PROFILE_UPLOAD_ROOT = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../uploads/profiles'
+);
 
 async function removeUploadDir(dirPath) {
   try {
@@ -35,8 +40,8 @@ export async function deleteMentorRelatedData(userId, mentor) {
   await MentorPost.destroy({ where: { user_id: userId } });
   await MentorExperience.destroy({ where: { mentor_id: userId } });
 
-  if (mentor?.profile_picture) {
-    await removeStoredProfilePicture(userId, mentor.profile_picture);
+  // Legacy local profile uploads (avatars now use Cloudinary via /users/me/profile-picture).
+  if (mentor?.profile_picture && /\/profile-pictures\//i.test(String(mentor.profile_picture))) {
+    await removeUploadDir(path.join(LEGACY_PROFILE_UPLOAD_ROOT, String(userId)));
   }
-  await removeUploadDir(profilePictureUploadDir(userId));
 }

@@ -1,7 +1,8 @@
 import { protect } from '../../../middleware/auth/auth.js';
 import { authorize } from '../../../middleware/auth/rbacAuthorize.js';
 
-export const mentorAuth = [protect, authorize('mentor')];
+/** DB may store teacher; API role for mentors is mentor. */
+export const mentorAuth = [protect, authorize('mentor', 'teacher')];
 
 export function registerUploadErrorHandler(router) {
   router.use((err, req, res, next) => {

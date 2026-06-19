@@ -13,7 +13,6 @@ const mentorRoutes = {
   list: '/v1/mentors',
   search: '/v1/mentors/search',
   byId: (userId) => `/v1/mentors/${userId}`,
-  profilePicture: (userId) => `/v1/mentors/${userId}/profile-picture`,
   profileViews: (userId) => `/v1/mentors/${userId}/profile-views`,
   me: '/v1/mentors/me',
   myAnalytics: '/v1/mentors/me/analytics',
